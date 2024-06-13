@@ -1,16 +1,41 @@
-import React, { useState } from "react";
+import { FormEvent, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useRegisterUser } from "../../hooks/useRegisterUser";
 
 export const Register: React.FC = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
-  console.log(name, email, password);
+  const { mutate } = useRegisterUser();
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError("");
+
+    mutate(
+      {
+        name,
+        email,
+        password,
+      },
+      {
+        onError: () => {
+          setError("Erro ao registrar. Por favor, tente novamente.");
+        },
+        onSuccess: () => {
+          navigate("/");
+        },
+      }
+    );
+  };
 
   return (
     <div>
       <h1>Registro</h1>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <label>Nome</label>
           <input
@@ -38,8 +63,9 @@ export const Register: React.FC = () => {
             required
           />
         </div>
-        <button type="submit">Criar conta</button>
+        <button type="submit">Criar Conta</button>
       </form>
+      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };
